@@ -34,13 +34,7 @@ export function SortableItem(props: { id: string }) {
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className=""
-    >
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <InnerItem name={props.id} />
     </div>
   );
@@ -86,7 +80,7 @@ function GroupContainer(props: { id: string; items: string[] }) {
     >
       <div
         ref={setNodeRef}
-        className="space-y-4 rounded-lg bg-neutral-200 p-4 shadow-lg"
+        className="min-h-full space-y-4 rounded-lg bg-neutral-200 p-4 shadow-lg"
       >
         {items.map((id) => (
           <SortableItem key={id} id={id} />
@@ -96,21 +90,20 @@ function GroupContainer(props: { id: string; items: string[] }) {
   );
 }
 
-// O(n) space and time
+// O(n) space and time based on keys in `items`
 function findItemContainer(items: TDraggableItems, itemID: string) {
   // Two options: either maintain internal map (performant reads) or calculate dynamically
   // For maintaining internal map, could reduce into TDraggableItems in O(n) per render, but sorting/maintaining sort order could be a problem
 
-  // Type of each entry is [string, string[]] -> [groupID, list of group member IDs]
-  const matchingEntry = Object.entries(items).find(([, groupMemberSet]) =>
-    groupMemberSet.includes(itemID)
-  );
+  // itemID can be ANY droppable area
 
-  if (matchingEntry) {
-    const [groupID] = matchingEntry;
-    return groupID as TWarGroup;
+  if (itemID in items) {
+    return itemID as TWarGroup;
   }
-  return undefined; // no matching group
+
+  return Object.keys(items).find((key) =>
+    items[key as TWarGroup].includes(itemID)
+  ) as TWarGroup;
 }
 
 export default function RosterMaker() {
@@ -176,6 +169,9 @@ export default function RosterMaker() {
     const overId = over?.id as string;
     if (!active || !over) return;
     if (!id || !overId) return;
+    console.log(
+      `Draggable item ${id} was moved over droppable area ${overId}.`
+    );
 
     // Find the containers
     const activeContainer = findItemContainer(items, id);
@@ -233,6 +229,10 @@ export default function RosterMaker() {
     const overId = over?.id as string;
     if (!active || !over) return;
     if (!id || !overId) return;
+
+    console.log(
+      `Draggable item ${id} was dropped over droppable area ${overId}`
+    );
 
     const activeContainer = findItemContainer(items, id);
     const overContainer = findItemContainer(items, overId);
