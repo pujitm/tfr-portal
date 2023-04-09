@@ -9,6 +9,10 @@ import {
   useSensors,
   useDroppable,
   DragOverlay,
+  defaultDropAnimationSideEffects,
+  closestCorners,
+  DragOverEvent,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -18,7 +22,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useState } from "react";
 
 export function SortableItem(props: { id: string }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -35,9 +39,17 @@ export function SortableItem(props: { id: string }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="rounded-md bg-neutral-50 px-4 py-2"
+      className=""
     >
-      An Item {props.id}
+      <InnerItem name={props.id} />
+    </div>
+  );
+}
+
+function InnerItem({ name }: { name: string }) {
+  return (
+    <div className="rounded-md border border-neutral-100 bg-neutral-50 px-4 py-2">
+      {name}
     </div>
   );
 }
@@ -60,19 +72,45 @@ const warGroups = [
 type TWarGroup = (typeof warGroups)[number];
 type TDraggableItems = Record<TWarGroup, string[]>;
 
-function GroupContainer(props: PropsWithChildren<{ id: string }>) {
+function GroupContainer(props: { id: string; items: string[] }) {
   // Enables dragging items into empty list
+  const { id, items } = props;
   const { setNodeRef } = useDroppable({
-    id: props.id,
+    id,
   });
   return (
-    <div
-      ref={setNodeRef}
-      className="space-y-4 rounded-lg bg-neutral-200 p-4 shadow-lg"
+    <SortableContext
+      id={id}
+      items={items}
+      strategy={verticalListSortingStrategy}
     >
-      {props.children}
-    </div>
+      <div
+        ref={setNodeRef}
+        className="space-y-4 rounded-lg bg-neutral-200 p-4 shadow-lg"
+      >
+        {items.map((id) => (
+          <SortableItem key={id} id={id} />
+        ))}
+      </div>
+    </SortableContext>
   );
+}
+
+// O(n) space and time
+function findItemContainer(items: TDraggableItems, itemID: string) {
+  // Two options: either maintain internal map (performant reads) or calculate dynamically
+  // For maintaining internal map, could reduce into TDraggableItems in O(n) per render, but sorting/maintaining sort order could be a problem
+
+  // Type of each entry is [string, string[]] -> [groupID, list of group member IDs]
+  const matchingEntry = Object.entries(items).find(([, groupMemberSet]) =>
+    groupMemberSet.includes(itemID)
+  );
+
+  if (matchingEntry) {
+    const [groupID] = matchingEntry;
+    return groupID as TWarGroup;
+  }
+  return undefined; // no matching group
 }
 
 export default function RosterMaker() {
@@ -98,40 +136,129 @@ export default function RosterMaker() {
   );
 
   return (
+    // Based on https://codesandbox.io/s/dnd-kit-multi-containers-uvris1?file=/src/index.js
+    // with adaptations from https://github.com/clauderic/dnd-kit/blob/5c58f0fe5d19b5aaa5cf93572f3435f4a0a6e54f/stories/2%20-%20Presets/Sortable/MultipleContainers.tsx#L315
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={closestCorners}
       onDragStart={(event) => {
         setActiveId(event.active.id as string);
       }}
-      onDragEnd={() => setActiveId(null)}
-      // onDragEnd={(event) => {
-      //   const { active, over } = event;
-
-      //   if (active.id !== over?.id) {
-      //     setItems((items) => {
-      //       const oldIndex = items.indexOf(active.id as string);
-      //       const newIndex = items.indexOf(over?.id as string);
-
-      //       return arrayMove(items, oldIndex, newIndex);
-      //     });
-      //   }
-      // }}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
     >
       <div className="grid grid-cols-5 gap-4">
         {warGroups.map((name) => (
-          <GroupContainer key={name} id={name}>
-            <SortableContext items={items[name]}>
-              {items[name].map((id) => (
-                <SortableItem key={id} id={id} />
-              ))}
-            </SortableContext>
-          </GroupContainer>
+          <GroupContainer key={name} id={name} items={items[name]} />
         ))}
       </div>
-      <DragOverlay>
+      {/* DragOverlay enables drag animations outside the container */}
+      <DragOverlay
+        // From https://github.com/clauderic/dnd-kit/blob/5c58f0fe5d19b5aaa5cf93572f3435f4a0a6e54f/stories/2%20-%20Presets/Sortable/MultipleContainers.tsx#L107
+        dropAnimation={{
+          sideEffects: defaultDropAnimationSideEffects({
+            styles: {
+              active: {
+                opacity: "0.5",
+              },
+            },
+          }),
+        }}
+      >
         {activeId ? <SortableItem id={activeId} /> : null}
       </DragOverlay>
     </DndContext>
   );
+
+  function handleDragOver(event: DragOverEvent) {
+    const { active, over } = event;
+    const id = active.id as string;
+    const overId = over?.id as string;
+    if (!active || !over) return;
+    if (!id || !overId) return;
+
+    // Find the containers
+    const activeContainer = findItemContainer(items, id);
+    const overContainer = findItemContainer(items, overId);
+
+    if (
+      !activeContainer ||
+      !overContainer ||
+      activeContainer === overContainer
+    ) {
+      return;
+    }
+
+    setItems((prev) => {
+      const activeItems = prev[activeContainer];
+      const overItems = prev[overContainer];
+
+      // Find the indexes for the items
+      const activeIndex = activeItems.indexOf(id);
+      const overIndex = overItems.indexOf(overId);
+
+      let newIndex;
+      if (overId in prev) {
+        // We're at the root droppable of a container
+        newIndex = overItems.length + 1;
+      } else {
+        const isBelowLastItem =
+          over &&
+          overIndex === overItems.length - 1 &&
+          active.rect.current.translated &&
+          active.rect.current.translated.top > over.rect.top + over.rect.height;
+
+        const modifier = isBelowLastItem ? 1 : 0;
+
+        newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
+      }
+
+      return {
+        ...prev,
+        [activeContainer]: [
+          ...prev[activeContainer].filter((item) => item !== active.id),
+        ],
+        [overContainer]: [
+          ...prev[overContainer].slice(0, newIndex),
+          items[activeContainer][activeIndex],
+          ...prev[overContainer].slice(newIndex, prev[overContainer].length),
+        ],
+      };
+    });
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    const id = active.id as string;
+    const overId = over?.id as string;
+    if (!active || !over) return;
+    if (!id || !overId) return;
+
+    const activeContainer = findItemContainer(items, id);
+    const overContainer = findItemContainer(items, overId);
+
+    if (
+      !activeContainer ||
+      !overContainer ||
+      activeContainer !== overContainer
+    ) {
+      return;
+    }
+
+    const activeIndex = items[activeContainer].indexOf(id);
+    const overIndex = items[overContainer].indexOf(overId);
+
+    if (activeIndex !== overIndex) {
+      setItems((items) => ({
+        ...items,
+        [overContainer]: arrayMove(
+          items[overContainer],
+          activeIndex,
+          overIndex
+        ),
+      }));
+    }
+
+    setActiveId(null);
+  }
 }

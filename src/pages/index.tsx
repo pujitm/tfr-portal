@@ -24,10 +24,13 @@ const Home: NextPage = () => {
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             TFR <span className="text-[hsl(280,100%,70%)]">Roster</span> Builder
           </h1>
-          <RosterMaker />
+
           <p className="text-2xl text-white">
             {hello.data ? hello.data.greeting : "Loading tRPC query..."}
           </p>
+        </div>
+        <div className="w-full px-24">
+          <RosterMaker />
         </div>
       </main>
     </>
