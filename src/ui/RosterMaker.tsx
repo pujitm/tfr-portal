@@ -22,11 +22,37 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { type PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useState, useEffect } from "react";
+import { Item } from "./sortable/Item/Item";
+
+function useMountStatus() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    // I believe this is an animation delay
+    // from https://github.com/clauderic/dnd-kit/blob/master/stories/2%20-%20Presets/Sortable/MultipleContainers.tsx#L717
+    const timeout = setTimeout(() => setIsMounted(true), 500);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  return isMounted;
+}
 
 export function SortableItem(props: { id: string }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: props.id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+    isSorting,
+    over,
+    overIndex,
+  } = useSortable({ id: props.id });
+  const mounted = useMountStatus();
+  const mountedWhileDragging = isDragging && !mounted;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -35,7 +61,15 @@ export function SortableItem(props: { id: string }) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <InnerItem name={props.id} />
+      {/* <InnerItem name={props.id} /> */}
+      <Item
+        value={props.id}
+        // Color of the left indicator
+        color="#7193f1"
+        fadeIn={mountedWhileDragging}
+        dragging={isDragging}
+        sorting={isSorting}
+      />
     </div>
   );
 }
@@ -80,8 +114,9 @@ function GroupContainer(props: { id: string; items: string[] }) {
     >
       <div
         ref={setNodeRef}
-        className="min-h-full space-y-4 rounded-lg bg-neutral-200 p-4 shadow-lg"
+        className="min-h-full space-y-4 rounded-lg bg-neutral-200 p-4 pb-8 shadow-lg"
       >
+        <h2 className="font-semibold">{id}</h2>
         {items.map((id) => (
           <SortableItem key={id} id={id} />
         ))}
@@ -91,7 +126,7 @@ function GroupContainer(props: { id: string; items: string[] }) {
 }
 
 // O(n) space and time based on keys in `items`
-function findItemContainer(items: TDraggableItems, itemID: string) {
+function findContainer(items: TDraggableItems, itemID: string) {
   // Two options: either maintain internal map (performant reads) or calculate dynamically
   // For maintaining internal map, could reduce into TDraggableItems in O(n) per render, but sorting/maintaining sort order could be a problem
 
@@ -137,7 +172,9 @@ export default function RosterMaker() {
       onDragStart={(event) => {
         setActiveId(event.active.id as string);
       }}
+      // Get item to correct column
       onDragOver={handleDragOver}
+      // Get to correct position within column
       onDragEnd={handleDragEnd}
     >
       <div className="grid grid-cols-5 gap-4">
@@ -173,9 +210,8 @@ export default function RosterMaker() {
       `Draggable item ${id} was moved over droppable area ${overId}.`
     );
 
-    // Find the containers
-    const activeContainer = findItemContainer(items, id);
-    const overContainer = findItemContainer(items, overId);
+    const activeContainer = findContainer(items, id);
+    const overContainer = findContainer(items, overId);
 
     if (
       !activeContainer ||
@@ -229,14 +265,11 @@ export default function RosterMaker() {
     const overId = over?.id as string;
     if (!active || !over) return;
     if (!id || !overId) return;
-
     console.log(
       `Draggable item ${id} was dropped over droppable area ${overId}`
     );
-
-    const activeContainer = findItemContainer(items, id);
-    const overContainer = findItemContainer(items, overId);
-
+    const activeContainer = findContainer(items, id);
+    const overContainer = findContainer(items, overId);
     if (
       !activeContainer ||
       !overContainer ||
@@ -244,10 +277,8 @@ export default function RosterMaker() {
     ) {
       return;
     }
-
     const activeIndex = items[activeContainer].indexOf(id);
     const overIndex = items[overContainer].indexOf(overId);
-
     if (activeIndex !== overIndex) {
       setItems((items) => ({
         ...items,
@@ -258,7 +289,6 @@ export default function RosterMaker() {
         ),
       }));
     }
-
     setActiveId(null);
   }
 }
