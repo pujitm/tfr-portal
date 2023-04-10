@@ -177,7 +177,7 @@ export default function RosterMaker() {
       // Get to correct position within column
       onDragEnd={handleDragEnd}
     >
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {warGroups.map((name) => (
           <GroupContainer key={name} id={name} items={items[name]} />
         ))}
