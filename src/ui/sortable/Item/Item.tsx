@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import classNames from "classnames";
 import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 import type { Transform } from "@dnd-kit/utilities";
+import classNames from "classnames";
 
 // Copy pasta from https://github.com/clauderic/dnd-kit/blob/master/stories/components/Item/Item.tsx
 

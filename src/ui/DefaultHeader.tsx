@@ -1,7 +1,8 @@
 import { type ReactNode } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "./primitive/Avatar";
 import Link from "next/link";
+
 import ThemeSelect from "./ThemeSelect";
+import { Avatar, AvatarFallback, AvatarImage } from "./primitive/Avatar";
 
 type DefaultHeaderProps = {
   /** Appended after "TFR" in the header */

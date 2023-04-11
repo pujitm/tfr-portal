@@ -1,9 +1,8 @@
-import Head from "next/head";
 import type { PropsWithChildren, ReactNode } from "react";
-import DefaultMeta from "./DefaultMeta";
-import { Avatar, AvatarFallback, AvatarImage } from "./primitive/Avatar";
-import DefaultHeader from "./DefaultHeader";
+
 import cn from "~/utils/classnames";
+import DefaultHeader from "./DefaultHeader";
+import DefaultMeta from "./DefaultMeta";
 
 type BasePageProps = PropsWithChildren<{
   /**

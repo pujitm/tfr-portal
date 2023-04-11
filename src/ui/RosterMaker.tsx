@@ -1,33 +1,33 @@
 // Drag and drop roster builder
 
+import { useEffect, useState, type PropsWithChildren } from "react";
 import {
   DndContext,
-  closestCenter,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
+  closestCorners,
+  defaultDropAnimationSideEffects,
+  useDroppable,
   useSensor,
   useSensors,
-  useDroppable,
-  DragOverlay,
-  defaultDropAnimationSideEffects,
-  closestCorners,
-  DragOverEvent,
-  DragEndEvent,
+  type DragEndEvent,
+  type DragOverEvent,
 } from "@dnd-kit/core";
 import {
-  arrayMove,
   SortableContext,
+  arrayMove,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
   useSortable,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { type PropsWithChildren, useState, useEffect } from "react";
-import { Item } from "./sortable/Item/Item";
-import cn from "~/utils/classnames";
-import { useToggle } from "usehooks-ts";
 import clsx from "clsx";
+import { useToggle } from "usehooks-ts";
+
+import cn from "~/utils/classnames";
 import { Button } from "./primitive/Button";
+import { Item } from "./sortable/Item/Item";
 
 function useMountStatus() {
   const [isMounted, setIsMounted] = useState(false);

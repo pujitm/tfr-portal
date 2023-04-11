@@ -1,23 +1,8 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
-// import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
-
-import { useToggle } from "usehooks-ts";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { Button } from "../primitive/Button";
 import clsx from "clsx";
+import { useToggle } from "usehooks-ts";
+
+import { Button } from "../primitive/Button";
 
 type PushFormProps = {
   initiallyOpen?: boolean;

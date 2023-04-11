@@ -1,19 +1,11 @@
 import { type NextPage } from "next";
-import dynamic from "next/dynamic";
-import { api } from "~/utils/api";
-import BasePage from "~/ui/BasePage";
-import DefaultMeta from "~/ui/DefaultMeta";
-import DefaultHeader from "~/ui/DefaultHeader";
-import { Avatar, AvatarFallback, AvatarImage } from "~/ui/primitive/Avatar";
-import ThemeSelect from "~/ui/ThemeSelect";
 import Link from "next/link";
+
+import DefaultMeta from "~/ui/DefaultMeta";
+import ThemeSelect from "~/ui/ThemeSelect";
 import { Button } from "~/ui/primitive/Button";
 
-const RosterMaker = dynamic(() => import("../ui/RosterMaker"), { ssr: false });
-
 const SplashPage: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
   return (
     <>
       <DefaultMeta />

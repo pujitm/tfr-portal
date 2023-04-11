@@ -1,13 +1,12 @@
 import { type NextPage } from "next";
-import Head from "next/head";
-import Link from "next/link";
 import dynamic from "next/dynamic";
-
-const RosterMaker = dynamic(() => import("../ui/RosterMaker"), { ssr: false });
+import Head from "next/head";
 
 // import RosterMaker from "~/ui/RosterMaker";
 
 import { api } from "~/utils/api";
+
+const RosterMaker = dynamic(() => import("../ui/RosterMaker"), { ssr: false });
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });

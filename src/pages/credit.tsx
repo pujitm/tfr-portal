@@ -1,12 +1,10 @@
 import { type NextPage } from "next";
 import dynamic from "next/dynamic";
+
 import { api } from "~/utils/api";
 import BasePage from "~/ui/BasePage";
-import DefaultMeta from "~/ui/DefaultMeta";
 import DefaultHeader from "~/ui/DefaultHeader";
 import PushForm from "~/ui/forms/Push";
-
-const RosterMaker = dynamic(() => import("../ui/RosterMaker"), { ssr: false });
 
 const PushCreditPage: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
