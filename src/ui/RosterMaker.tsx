@@ -96,6 +96,11 @@ const warGroups = [
   "Reserve",
 ] as const;
 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from -> Sequence Generator
+const range = (start: number, stop: number, step: number) =>
+  Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
+const mockPlayers = range(1, 50, 1).map((num) => `Player ${num}`);
+
 // https://steveholgado.com/typescript-types-from-arrays/
 type TWarGroup = (typeof warGroups)[number];
 type TDraggableItems = Record<TWarGroup, string[]>;
@@ -143,17 +148,17 @@ function findContainer(items: TDraggableItems, itemID: string) {
 
 export default function RosterMaker() {
   const [items, setItems] = useState<TDraggableItems>({
-    G1: ["Player 1", "Player 2"],
-    G2: ["Player 3", "Player 4"],
-    G3: ["Player 5", "Player 6"],
-    G4: ["Player 7", "Player 8"],
-    G5: ["Player 9", "Player 10"],
-    G6: ["Player 11", "Player 12"],
-    G7: ["Player 13", "Player 14"],
-    G8: ["Player 15", "Player 16"],
-    G9: ["Player 17", "Player 18"],
-    G10: ["Player 19", "Player 20"],
-    Reserve: ["Player 21", "Player 22"],
+    G1: mockPlayers.slice(0, 5),
+    G2: mockPlayers.slice(5, 10),
+    G3: mockPlayers.slice(10, 15),
+    G4: mockPlayers.slice(15, 20),
+    G5: mockPlayers.slice(20, 25),
+    G6: mockPlayers.slice(25, 30),
+    G7: mockPlayers.slice(30, 35),
+    G8: mockPlayers.slice(35, 40),
+    G9: mockPlayers.slice(40, 45),
+    G10: mockPlayers.slice(45, 50),
+    Reserve: ["Player 51", "Player 52"],
   });
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
