@@ -10,7 +10,7 @@ type DefaultHeaderProps = {
 export default function DefaultHeader(props: DefaultHeaderProps) {
   const TitleAffect = props.titleAffect ?? <></>;
   return (
-    <header className="hidden w-full justify-between px-8 py-2 md:flex">
+    <header className="mt-2 hidden w-full justify-between px-8 py-2 md:flex">
       <div className="flex items-center gap-4">
         {/* <Link href={"/"}>
           <Avatar>

@@ -16,6 +16,7 @@ const SplashPage: NextPage = () => {
 
   return (
     <>
+      <BaseMeta />
       {/* Based on https://webhookthing.com/ */}
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-indigo-800/40 transition-all animate-in fade-in duration-1000 ease-in-out dark:bg-gray-800 ">
         <div className="flex items-center">
