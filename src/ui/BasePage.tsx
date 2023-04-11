@@ -26,7 +26,7 @@ export default function BasePage(props: BasePageProps) {
   return (
     <>
       {Meta}
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-indigo-800/40 transition-all animate-in fade-in duration-1000 ease-in-out dark:bg-gray-800">
+      <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-indigo-800/40 transition-all animate-in fade-in duration-1000 ease-in-out dark:bg-gray-800">
         {/* <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white to-orange-100 py-16"> */}
         {Header}
         {props.children}

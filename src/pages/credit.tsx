@@ -27,7 +27,11 @@ const PushCreditPage: NextPage = () => {
       }
     >
       <div className="container w-full px-8 py-12 md:px-16 xl:px-24">
-        <PushForm />
+        <div className="space-y-12">
+          <PushForm initiallyOpen />
+          <PushForm />
+          <PushForm />
+        </div>
       </div>
     </BasePage>
   );
