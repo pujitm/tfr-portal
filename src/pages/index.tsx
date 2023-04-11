@@ -36,14 +36,31 @@ const SplashPage: NextPage = () => {
             <p>Toggle Theme</p>
             <ThemeSelect />
           </div>
-          <div className="flex gap-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8">
             <Link href={"/roster"}>
-              <Button>Roster Builder</Button>
+              <Button className="w-full">Roster Builder</Button>
             </Link>
             <Link href={"/legacy-roster"}>
-              <Button>Old Roster Builder</Button>
+              <Button className="w-full">Old Roster Builder</Button>
+            </Link>
+            <Link href={"/builds"}>
+              <Button className="w-full">Builds</Button>
+            </Link>
+            <Link href={"/vods"}>
+              <Button className="w-full">Vods</Button>
+            </Link>
+            <Link href={"/kb"}>
+              <Button className="w-full">Knowledge Base</Button>
+            </Link>
+            <Link href={"/credit"}>
+              <Button className="w-full">Payout/push credit</Button>
+            </Link>
+            {/* Can be in discord */}
+            <Link href={"/checkIn"}>
+              <Button className="w-full">War check in confirmation</Button>
             </Link>
           </div>
+          <div className="flex gap-4"></div>
         </div>
       </div>
     </>
