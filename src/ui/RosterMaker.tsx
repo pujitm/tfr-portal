@@ -24,6 +24,10 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { type PropsWithChildren, useState, useEffect } from "react";
 import { Item } from "./sortable/Item/Item";
+import cn from "~/utils/classnames";
+import { useToggle } from "usehooks-ts";
+import clsx from "clsx";
+import { Button } from "./primitive/Button";
 
 function useMountStatus() {
   const [isMounted, setIsMounted] = useState(false);
@@ -82,7 +86,7 @@ function InnerItem({ name }: { name: string }) {
   );
 }
 
-const warGroups = [
+const activeGroups = [
   "G1",
   "G2",
   "G3",
@@ -93,21 +97,27 @@ const warGroups = [
   "G8",
   "G9",
   "G10",
-  "Reserve",
 ] as const;
+
+const warGroups = [...activeGroups, "Reserve"] as const;
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from -> Sequence Generator
 const range = (start: number, stop: number, step: number) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 const mockPlayers = range(1, 50, 1).map((num) => `Player ${num}`);
+const mockReserve = range(1, 20, 1).map((num) => `Reserve ${num}`);
 
 // https://steveholgado.com/typescript-types-from-arrays/
 type TWarGroup = (typeof warGroups)[number];
 type TDraggableItems = Record<TWarGroup, string[]>;
 
-function GroupContainer(props: { id: string; items: string[] }) {
+function GroupContainer(props: {
+  id: string;
+  items: string[];
+  className?: string;
+}) {
   // Enables dragging items into empty list
-  const { id, items } = props;
+  const { id, items, className = "" } = props;
   const { setNodeRef } = useDroppable({
     id,
   });
@@ -119,7 +129,10 @@ function GroupContainer(props: { id: string; items: string[] }) {
     >
       <div
         ref={setNodeRef}
-        className="min-h-full space-y-4 rounded-lg bg-neutral-100 p-4 pb-8 shadow-lg dark:bg-gray-800 dark:bg-gradient-to-br dark:from-indigo-700/90"
+        className={cn(
+          "min-h-full space-y-4 rounded-lg bg-neutral-100 p-4 pb-8 shadow-lg dark:bg-gray-800 dark:bg-gradient-to-br dark:from-indigo-700/90",
+          className
+        )}
       >
         <h2 className="font-semibold">{id}</h2>
         {items.map((id) => (
@@ -147,6 +160,7 @@ function findContainer(items: TDraggableItems, itemID: string) {
 }
 
 export default function RosterMaker() {
+  const [showReserve, toggle] = useToggle();
   const [items, setItems] = useState<TDraggableItems>({
     G1: mockPlayers.slice(0, 5),
     G2: mockPlayers.slice(5, 10),
@@ -158,8 +172,9 @@ export default function RosterMaker() {
     G8: mockPlayers.slice(35, 40),
     G9: mockPlayers.slice(40, 45),
     G10: mockPlayers.slice(45, 50),
-    Reserve: ["Player 51", "Player 52"],
+    Reserve: mockReserve,
   });
+  const { Reserve, ...activeRoster } = items;
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -182,10 +197,27 @@ export default function RosterMaker() {
       // Get to correct position within column
       onDragEnd={handleDragEnd}
     >
+      <Button className="mb-2" onClick={toggle}>
+        {showReserve && "Hide Reserve"}
+        {!showReserve && "Show Reserve"}
+      </Button>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-        {warGroups.map((name) => (
+        {activeGroups.map((name) => (
           <GroupContainer key={name} id={name} items={items[name]} />
         ))}
+      </div>
+      <div
+        className={clsx(
+          "fixed right-2 top-14 animate-in fade-in slide-in-from-right-12 duration-500 md:right-3 md:top-28 ",
+          !showReserve && "hidden"
+        )}
+      >
+        <GroupContainer
+          className="max-h-[85vh] min-w-[200px] overflow-scroll"
+          key={"Reserve"}
+          id="Reserve"
+          items={Reserve}
+        />
       </div>
       {/* DragOverlay enables drag animations outside the container */}
       <DragOverlay
