@@ -7,7 +7,7 @@ type BaseMetaProps = {
 /**
  * Minimum meta tags that should be present on every page
  */
-export default function BaseMeta(props: BaseMetaProps) {
+export default function DefaultMeta(props: BaseMetaProps) {
   const { title = "TFR Portal", description = "A New World Company portal." } =
     props;
   return (

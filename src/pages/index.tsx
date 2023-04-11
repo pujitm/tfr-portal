@@ -2,7 +2,7 @@ import { type NextPage } from "next";
 import dynamic from "next/dynamic";
 import { api } from "~/utils/api";
 import BasePage from "~/ui/BasePage";
-import BaseMeta from "~/ui/BaseMeta";
+import DefaultMeta from "~/ui/DefaultMeta";
 import DefaultHeader from "~/ui/DefaultHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "~/ui/primitive/Avatar";
 import ThemeSelect from "~/ui/ThemeSelect";
@@ -16,7 +16,7 @@ const SplashPage: NextPage = () => {
 
   return (
     <>
-      <BaseMeta />
+      <DefaultMeta />
       {/* Based on https://webhookthing.com/ */}
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-indigo-800/40 transition-all animate-in fade-in duration-1000 ease-in-out dark:bg-gray-800 ">
         <div className="flex items-center">

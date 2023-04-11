@@ -2,7 +2,7 @@ import { type NextPage } from "next";
 import dynamic from "next/dynamic";
 import { api } from "~/utils/api";
 import BasePage from "~/ui/BasePage";
-import BaseMeta from "~/ui/BaseMeta";
+import DefaultMeta from "~/ui/DefaultMeta";
 import DefaultHeader from "~/ui/DefaultHeader";
 
 const RosterMaker = dynamic(() => import("../ui/RosterMaker"), { ssr: false });

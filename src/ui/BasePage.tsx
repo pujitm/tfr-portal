@@ -1,8 +1,9 @@
 import Head from "next/head";
 import type { PropsWithChildren, ReactNode } from "react";
-import BaseMeta from "./BaseMeta";
+import DefaultMeta from "./DefaultMeta";
 import { Avatar, AvatarFallback, AvatarImage } from "./primitive/Avatar";
 import DefaultHeader from "./DefaultHeader";
+import cn from "~/utils/classnames";
 
 type BasePageProps = PropsWithChildren<{
   /**
@@ -17,16 +18,22 @@ type BasePageProps = PropsWithChildren<{
   description?: string;
   /** The header at the top of the page. Uses default if not defined. */
   header?: ReactNode;
+  className?: string;
 }>;
 export default function BasePage(props: BasePageProps) {
   const Meta = props.meta ?? (
-    <BaseMeta title={props.title} description={props.description} />
+    <DefaultMeta title={props.title} description={props.description} />
   );
   const Header = props.header ?? <DefaultHeader />;
   return (
     <>
       {Meta}
-      <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-indigo-800/40 transition-all animate-in fade-in duration-1000 ease-in-out dark:bg-gray-800">
+      <div
+        className={cn(
+          "flex min-h-screen flex-col items-center bg-gradient-to-br from-indigo-800/40 transition-all animate-in fade-in duration-1000 ease-in-out dark:bg-gray-800",
+          props.className
+        )}
+      >
         {/* <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white to-orange-100 py-16"> */}
         {Header}
         {props.children}
