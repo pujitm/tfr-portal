@@ -114,7 +114,7 @@ function GroupContainer(props: { id: string; items: string[] }) {
     >
       <div
         ref={setNodeRef}
-        className="min-h-full space-y-4 rounded-lg bg-neutral-200 p-4 pb-8 shadow-lg"
+        className="min-h-full space-y-4 rounded-lg bg-neutral-100 p-4 pb-8 shadow-lg dark:bg-gray-800 dark:bg-gradient-to-br dark:from-indigo-700/90"
       >
         <h2 className="font-semibold">{id}</h2>
         {items.map((id) => (
