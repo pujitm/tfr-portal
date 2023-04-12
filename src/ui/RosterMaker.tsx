@@ -64,7 +64,9 @@ export function SortableItem(props: { id: string }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <>
+      {/* Old code left for reference in case we need the entire item to be draggable instead of just the handle */}
+      {/* <div ref={setNodeRef} style={style} {...attributes} {...listeners}> */}
       {/* <InnerItem name={props.id} /> */}
       <Item
         value={props.id}
@@ -74,8 +76,13 @@ export function SortableItem(props: { id: string }) {
         dragging={isDragging}
         sorting={isSorting}
         handle
+        // ref and listeners confine drag area. Since handle is true, Item confines it to the handle marker.
+        ref={setNodeRef}
+        style={style}
+        listeners={listeners}
       />
-    </div>
+      {/* </div> */}
+    </>
   );
 }
 
