@@ -1,6 +1,6 @@
 // Drag and drop roster builder
 
-import { useEffect, useState, type PropsWithChildren } from "react";
+import { memo, useEffect, useState, type PropsWithChildren } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -23,10 +23,19 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { useToggle } from "usehooks-ts";
+import { ChevronDown } from "lucide-react";
+import { useLocalStorage, useToggle } from "usehooks-ts";
 
 import cn from "~/utils/classnames";
+import { Icons } from "./Icons";
+import ThemeSelect from "./ThemeSelect";
 import { Button } from "./primitive/Button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./primitive/Dropdown";
 import { Item } from "./sortable/Item/Item";
 
 function useMountStatus() {
@@ -43,6 +52,12 @@ function useMountStatus() {
   return isMounted;
 }
 
+const RoleColors = {
+  bruiser: "#7193f1",
+  healer: "#71ffaa",
+  support: "#ff93ff",
+} as const;
+type RoleVariant = keyof typeof RoleColors;
 export function SortableItem(props: { id: string }) {
   const {
     attributes,
@@ -54,9 +69,12 @@ export function SortableItem(props: { id: string }) {
     isSorting,
     over,
     overIndex,
-  } = useSortable({ id: props.id });
+  } = useSortable({ id: props.id, data: { builds: ["bruiser"] } });
   const mounted = useMountStatus();
   const mountedWhileDragging = isDragging && !mounted;
+  // The idea here is to separate the state management of the chosen build from the list's/item's state.
+  // Using localstorage for the prototype, but this seems like a natural use case for jotai
+  const [role, setBuild] = useLocalStorage(props.id, "bruiser");
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -69,9 +87,9 @@ export function SortableItem(props: { id: string }) {
       {/* <div ref={setNodeRef} style={style} {...attributes} {...listeners}> */}
       {/* <InnerItem name={props.id} /> */}
       <Item
-        value={props.id}
+        value={<InnerItem id={props.id} setRole={setBuild} />}
         // Color of the left indicator
-        color="#7193f1"
+        color={RoleColors[role as RoleVariant]}
         fadeIn={mountedWhileDragging}
         dragging={isDragging}
         sorting={isSorting}
@@ -85,14 +103,41 @@ export function SortableItem(props: { id: string }) {
     </>
   );
 }
-
-function InnerItem({ name }: { name: string }) {
+type InnerItemProps = {
+  id: string;
+  setRole: (role: RoleVariant) => void;
+};
+const InnerItem = memo(function InnerItem(props: InnerItemProps) {
+  const { id, setRole } = props;
   return (
-    <div className="rounded-md border border-neutral-100 bg-neutral-50 px-4 py-2">
-      {name}
+    <div className="flex justify-between items-center w-full">
+      <p>{id}</p>
+      {/* <ThemeSelect /> */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-6">
+            <ChevronDown className="h-4 w-4" />
+            <span className="sr-only">Select Build</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setRole("bruiser")}>
+            <Icons.sun className="mr-2 h-4 w-4" />
+            <span>Bruiser</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setRole("healer")}>
+            <Icons.moon className="mr-2 h-4 w-4" />
+            <span>Healer</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setRole("support")}>
+            <Icons.laptop className="mr-2 h-4 w-4" />
+            <span>Support</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
-}
+});
 
 const activeGroups = [
   "G1",
