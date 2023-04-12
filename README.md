@@ -1,28 +1,42 @@
-# Create T3 App
+# Project Setup
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app` using [`pnpm`](https://pnpm.io/).
 
-## What's next? How do I make an app with this?
+- [T3 Discord](https://t3.gg/discord)
+- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+Technologies used:
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
-
+- [React Docs](https://react.dev/learn)
 - [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
+- [~~NextAuth.js~~](https://next-auth.js.org) [Clerk User Management](https://clerk.com/)
+- [Prisma](https://prisma.io) (iffy on serverless tho)
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
 
-## Learn More
+Deployed on Vercel.
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+## Project Structure
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+- `public` -> static files hosted at root of deployment, served via CDN
+- `package.json` -> dependencies and task scripts, `pnpm-lock.yaml` is the lockfile
+- `.env.example` -> example of environment variable override for local development
+- `src` has source code
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+### Source Code Structure
 
-## How do I deploy this?
+- `pages` -> everything under this directly corresponds to a route on the website. `_app.tsx` is behind-the-scenes setup that all pages share. Ignore `pages/api`, prefer using trpc routes under `server/api/routers/*`
+- `env.mjs` -> Strongly typed and validated environment config
+- `styles` -> tailwind setup
+- `utils` -> Client-side utilities
+- `server` -> server-side setup. API code lives in `server/api/routers/*`. Add routers to `server/root.ts`.
+- `ui` -> components, layouts, wrappers. Bucket for visual UI.
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+## How to run
+
+Run this in terminal:
+
+```bash
+pnpm install
+pnpm dev
+```
