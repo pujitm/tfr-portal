@@ -3,9 +3,11 @@ import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 import type { Transform } from "@dnd-kit/utilities";
 import classNames from "classnames";
 
-// Copy pasta from https://github.com/clauderic/dnd-kit/blob/master/stories/components/Item/Item.tsx
-
+import Handle from "./Handle";
 import styles from "./Item.module.scss";
+import Remove from "./Remove";
+
+// Copy pasta from https://github.com/clauderic/dnd-kit/blob/master/stories/components/Item/Item.tsx
 
 export interface Props {
   dragOverlay?: boolean;
@@ -141,12 +143,12 @@ export const Item = React.memo(
             tabIndex={!handle ? 0 : undefined}
           >
             {value}
-            {/* <span className={styles.Actions}>
+            <span className={styles.Actions}>
               {onRemove ? (
                 <Remove className={styles.Remove} onClick={onRemove} />
               ) : null}
               {handle ? <Handle {...handleProps} {...listeners} /> : null}
-            </span> */}
+            </span>
           </div>
         </li>
       );

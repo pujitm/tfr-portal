@@ -73,6 +73,7 @@ export function SortableItem(props: { id: string }) {
         fadeIn={mountedWhileDragging}
         dragging={isDragging}
         sorting={isSorting}
+        handle
       />
     </div>
   );
